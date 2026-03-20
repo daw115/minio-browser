@@ -490,6 +490,10 @@
       <label>Secret Key</label>
       <input id="secretKey" type="password" placeholder="secret-key">
     </div>
+    <div class="field">
+      <label>Buckety (opcjonalnie, oddziel przecinkami)</label>
+      <input id="manualBuckets" type="text" placeholder="np. ginp-cca, perun-spsm-sp">
+    </div>
     <button class="btn-connect" id="btnConnect" onclick="connect()">
       <span>Połącz</span>
     </button>
@@ -569,13 +573,22 @@ async function connect() {
     secretKey: document.getElementById('secretKey').value.trim(),
   };
 
+  const manualBuckets = document.getElementById('manualBuckets').value
+    .split(',').map(b => b.trim()).filter(Boolean);
+
   try {
-    const data = await api('/api/buckets', {});
+    let buckets = [];
+    if (manualBuckets.length > 0) {
+      buckets = manualBuckets;
+    } else {
+      const data = await api('/api/buckets', {});
+      buckets = data.buckets;
+    }
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
     document.getElementById('btnLogout').style.display = '';
     setDot('ok', creds.endpoint.replace('https://', ''));
-    renderBuckets(data.buckets);
+    renderBuckets(buckets);
   } catch (e) {
     err.textContent = e.message;
     err.style.display = '';

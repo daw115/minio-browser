@@ -4,7 +4,7 @@ const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { NodeHttpHandler } = require('@smithy/node-http-handler');
 const { HttpsProxyAgent } = require('https-proxy-agent');
 
-const PROXY = process.env.HTTPS_PROXY || 'http://proxy.pse.pl:8080';
+const PROXY = process.env.HTTPS_PROXY || 'http://172.25.128.233:8080';
 
 const app = express();
 app.use(express.json());

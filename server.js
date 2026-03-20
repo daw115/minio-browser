@@ -1,18 +1,26 @@
 const express = require('express');
 const { S3Client, ListBucketsCommand, ListObjectsV2Command, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const path = require('path');
+const { NodeHttpHandler } = require('@smithy/node-http-handler');
+const { HttpsProxyAgent } = require('https-proxy-agent');
+
+const PROXY = process.env.HTTPS_PROXY || 'http://proxy.pse.pl:8080';
 
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
 function getClient(endpoint, accessKey, secretKey) {
+  const agent = new HttpsProxyAgent(PROXY);
   return new S3Client({
     endpoint,
     region: 'us-east-1',
     credentials: { accessKeyId: accessKey, secretAccessKey: secretKey },
     forcePathStyle: true,
+    requestHandler: new NodeHttpHandler({
+      httpsAgent: agent,
+      httpAgent: agent,
+    }),
   });
 }
 
